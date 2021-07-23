@@ -1,0 +1,180 @@
+#######  Clustering #################
+
+# data create
+#inbuilt data iris
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+
+## load iris data
+#data = load_iris()
+#df = pd.DataFrame(np.column_stack((data.data, data.target)), columns = data.feature_names+['target'])
+#print(df.head())
+
+#df['target'] = df.target.replace(dict(enumerate(data.target_names)))
+#print(df.head())
+
+#df = df.ix[:,0:4]
+#df
+
+
+## better method of data loading
+
+import seaborn as sns
+iris = sns.load_dataset('iris')
+iris.head()
+df = iris.copy()
+rock = iris.copy()
+df = df.iloc[:,0:4]
+df.head()
+
+#pd.set_option('display.max_columns', None)#show all columns
+
+#scale the data
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(df)
+X_scaled = pd.DataFrame(X_scaled)
+df = X_scaled.copy()
+df.head()
+
+
+#elbow method - how many clusters
+# df is the dataset name; you need to change only df if you use
+# another dataset
+
+import numpy as np
+from sklearn.cluster import KMeans 
+from sklearn.metrics import silhouette_score 
+import matplotlib.pyplot as plt
+
+sse = {}
+for k in range(1, 15):
+    kmeans = KMeans(n_clusters=k, max_iter=1000).fit(df)
+    df["clusters"] = kmeans.labels_
+    #print(data["clusters"])
+    sse[k] = kmeans.inertia_ # Inertia: Sum of distances of samples to their closest cluster center
+plt.figure(figsize=(10,8))
+plt.plot(list(sse.keys()), list(sse.values()))
+plt.xlabel("Number of cluster")
+plt.ylabel("SSE")
+plt.show()
+
+
+
+    
+# create silhouette scores
+#delete the cluster column
+df = df.ix[:,0:4]
+df.head()
+    
+
+X = np.asarray(df)
+
+no_of_clusters = [2, 3, 4, 5, 6,7,8] 
+  
+for n_clusters in no_of_clusters: 
+  
+    cluster = KMeans(n_clusters = n_clusters) 
+    cluster_labels = cluster.fit_predict(X) 
+  
+    # The silhouette_score gives the  
+    # average value for all the samples. 
+    silhouette_avg = silhouette_score(X, cluster_labels) 
+  
+    print("For no of clusters =", n_clusters, 
+          " The average silhouette_score is :", silhouette_avg)
+
+
+### silhoutte interpretation
+    
+#0.71-1.0
+#A strong structure has been found
+
+#0.51-0.70
+#A reasonable structure has been found
+
+#0.26-0.50
+#The structure is weak and could be artificial. 
+
+#< 0.25
+#No substantial structure has been found
+
+
+
+
+# Using scikit-learn to perform K-Means clustering
+from sklearn.cluster import KMeans
+    
+# Specify the number of clusters (2) and fit the data X
+kmeans = KMeans(n_clusters=3, random_state=0).fit(df)
+print(kmeans.cluster_centers_)
+df.head()
+
+df.dtypes#for float rename all columns first, then rename selected ones
+
+#rename all
+df.columns = ["sepal_length","sepal_width","petal_length","petal_width"]
+
+#rename selected
+#df.columns.values[[0,1,2,3]] = ["sepal_length","sepal_width","petal_length","petal_width"]
+
+
+#plotting
+plt.scatter(df['sepal_length'], df['sepal_width'],
+c= kmeans.labels_.astype(float), s=50, alpha=0.5,cmap='rainbow')
+
+
+# Calculate silhouette_score - we had checked it earlier
+from sklearn.metrics import silhouette_score
+print(silhouette_score(X, kmeans.labels_))
+
+#show clusters
+rock.head()#original data
+df = rock.copy()
+df["clust"] = kmeans.labels_
+centroids = kmeans.cluster_centers_
+df.head()
+
+from sklearn import preprocessing
+le = preprocessing.LabelEncoder()
+
+df.species = le.fit_transform(df.species)
+df.head()
+
+#showing unique values
+df.species.unique()
+df.clust.unique()
+
+
+# these can only be used when actual clusters are given
+from sklearn import metrics
+
+#Adjusted Rand index # closer to 1 better the model
+metrics.adjusted_rand_score(df.species, df.clust)
+
+
+#Mutual Information based scores# closer to 1 better the model
+metrics.adjusted_mutual_info_score(df.species, df.clust)
+
+
+
+df = rock.copy()
+df["clust"] = kmeans.labels_
+df.head()
+
+#centroids 
+centroids = kmeans.cluster_centers_
+
+
+# export the data
+import os
+
+os.chdir('C:\\Users\\Subhojit\\Desktop\\Python\\Class 9 Cluster\\1')
+
+df.to_csv('bhulbhal.csv',index=False)#export data to local drive
+
+
+
+
+
