@@ -14,7 +14,7 @@ from sklearn.datasets import load_iris
 #df['target'] = df.target.replace(dict(enumerate(data.target_names)))
 #print(df.head())
 
-#df = df.ix[:,0:4]
+#df = df.iloc[:,0:4]
 #df
 
 
@@ -65,7 +65,7 @@ plt.show()
     
 # create silhouette scores
 #delete the cluster column
-df = df.ix[:,0:4]
+df = df.iloc[:,0:4]
 df.head()
     
 
